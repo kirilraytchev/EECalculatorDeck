@@ -1,0 +1,90 @@
+---
+title       : Energy Efficiency Calculator
+subtitle    : Choose your best borrowing capital option
+author      : Kiril Raytchev
+job         : 
+framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
+highlighter : highlight.js  # {highlight.js, prettify, highlight}
+hitheme     : tomorrow      # 
+widgets     : []            # {mathjax, quiz, bootstrap}
+mode        : selfcontained # {standalone, draft}
+knit        : slidify::knit2slides
+---
+
+## Procedure
+
+1. Input parameters
+2. Review results
+3. Analyze 
+4. Take a decision
+
+--- .class #id 
+
+## Input parameters
+
+```{r}
+projCosts <- 250000
+annualSavings <- 75000
+equpmentLife <- 10
+leaseTerm <- 4
+intRate <- 5
+```
+
+---
+
+## Review results
+
+```{r, echo=FALSE}
+ pay <- function(principal, interest, duration) {
+    
+    r <- (interest / 12)/100
+    d <- duration * 12
+    
+    payment <- principal * r / ( 1 - ( 1 + r)^-d)
+    res <- list(r=r, payment=payment, principal=principal)
+    return(res)
+ }
+
+df <- function(principal, interest, duration, annualSaving, lifespan) {
+    payYear <- pay(principal, interest, duration)$payment * 12
+    df_data_yr <- data.frame(year = seq(0, lifespan))
+    
+    df_data_yr$wasted <- 0
+    df_data_yr$wasted[(df_data_yr$year) == 0 ] <- annualSaving
+    
+    df_data_yr$payment <- 0
+    df_data_yr$payment[(df_data_yr$year) > 0 & (df_data_yr$year) <= duration] <- payYear
+    
+    df_data_yr$saved <- 0
+  
+    if ((annualSaving - payYear)>=0){
+      df_data_yr$saved[(df_data_yr$year) > 0 & (df_data_yr$year) <= duration] <- annualSaving - payYear
+      df_data_yr$saved[(df_data_yr$year) > duration & (df_data_yr$year) <= lifespan] <- annualSaving
+    }
+    else{
+      df_data_yr$saved[(df_data_yr$year) > duration & (df_data_yr$year) <= lifespan] <- annualSaving
+    }
+    return(df_data_yr)
+  }
+
+CashFlow <- df (projCosts,
+               intRate,
+               leaseTerm,
+               annualSavings,
+               equpmentLife) 
+    
+    paymnt <- pay(projCosts,
+                  intRate,
+                  leaseTerm)
+```
+
+```{r}
+    
+    CashFlow
+```
+
+---
+
+## Analyze content and take a decision
+
+Energy Efficiency project delivers annual savings that are able to pay the cost of borrowed capital.

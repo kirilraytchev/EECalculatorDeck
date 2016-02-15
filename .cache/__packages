@@ -1,0 +1,8 @@
+base
+shiny
+FinCal
+ggplot2
+reshape2
+scales
+devtools
+slidify
